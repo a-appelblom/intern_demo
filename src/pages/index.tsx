@@ -1,11 +1,46 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  Textarea,
+} from "@chakra-ui/react";
+import { on } from "events";
+import Head from "next/head";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const inter = Inter({ subsets: ['latin'] })
+const schema = z.object({
+  name: z
+    .string()
+    .min(2, { message: "Namnet måste vara längre än 2 tecken" })
+    .max(100, { message: "Namnet får inte vara längre än 100 tecken" }),
+  email: z.string().email({ message: "Du måste ange en giltig email" }),
+  message: z
+    .string()
+    .min(20, { message: "Meddelandet måste vara minst 20 tecken" })
+    .max(1000, { message: "Meddelandet får inte vara längre än 1000 tecken" }),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 export default function Home() {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data: FormValues) => {
+    console.log(data);
+  };
+
   return (
     <>
       <Head>
@@ -14,110 +49,30 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
 
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+      <Box as="main" maxW="96" mx="auto">
+        <Heading as="h1" w="full">
+          Hello from demo
+        </Heading>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FormControl isInvalid={!!errors.name}>
+            <FormLabel>Namn</FormLabel>
+            <Input {...register("name")} />
+            <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!errors.email}>
+            <FormLabel>Email</FormLabel>
+            <Input type="email" {...register("email")} />
+            <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+          </FormControl>
+          <FormControl isInvalid={!!errors.message}>
+            <FormLabel>Meddelande</FormLabel>
+            <Textarea {...register("message")} />
+            <FormErrorMessage>{errors.message?.message}</FormErrorMessage>
+          </FormControl>
+          <Button type="submit">Skicka</Button>
+        </form>
+      </Box>
     </>
-  )
+  );
 }

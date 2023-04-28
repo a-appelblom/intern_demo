@@ -1,5 +1,5 @@
 import { Box, Heading, Text } from "@chakra-ui/react";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 
 import { posts } from "../../posts";
 
@@ -12,6 +12,7 @@ type Props = {
 };
 
 export default function Post({ post }: Props) {
+  console.log(post);
   const { id, title, body } = post;
   return (
     <Box>
@@ -22,23 +23,25 @@ export default function Post({ post }: Props) {
 }
 
 export const getStaticPaths: GetStaticPaths = () => {
+  // Todo: change to fetch from api:route loading json file
   const paths = posts.map((post) => ({
     params: {
       post: post.id.toString(),
     },
   }));
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 };
 
-export const getStaticProps: GetStaticProps = (context) => {
-  console.log(context.params);
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   console.log(context.params);
 
-  const post = posts.find(
-    (post) => post.id.toString() === context.params?.post
-  );
-  return {
-    props: {
-      post,
-    },
-  };
-};
+//   const post = posts.find(
+//     (post) => post.id.toString() === context.params?.post
+//   );
+//   console.log(post);
+//   return {
+//     props: {
+//       post: post || { id: 10, title: "Not found", body: "Not found" },
+//     },
+//   };
+// };

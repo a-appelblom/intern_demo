@@ -8,9 +8,8 @@ import {
   Input,
   Textarea,
 } from "@chakra-ui/react";
-import { on } from "events";
 import Head from "next/head";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -37,8 +36,15 @@ export default function Home() {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     console.log(data);
+    const res = await fetch("/api/form", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    console.log(res);
+    const resData = await res.json();
+    console.log(resData);
   };
 
   return (
